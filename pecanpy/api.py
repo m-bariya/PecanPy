@@ -90,12 +90,7 @@ def read_metadata_table(con: sqlalchemy.engine.Connectable,
                         schema: str,
                         tz: str = "US/Central") -> pd.DataFrame:
     """Read PostgreSQL metadata table into a pandas DataFrame."""
-    datetime_columns = ["indoor_temp_min_time, indoor_temp_max_time",
-                        "gas_ert_min_time", "gas_ert_max_time",
-                        "water_ert_min_time", "water_ert_max_time",
-                        "egauge_min_time", "egauge_max_time"]
-    df = pd.read_sql_table("metadata", con, schema, index_col="dataid",
-                           parse_dates=datetime_columns)
+    df = pd.read_sql_table("metadata", con, schema, index_col="dataid")
 
     # Columns with only "yes" and `None` or " " should have type `bool`
     for column in df:
@@ -104,8 +99,15 @@ def read_metadata_table(con: sqlalchemy.engine.Connectable,
             df[column] = df[column] == "yes"
 
     # Columns that contain timestamps need to be made time-zone aware.
+    datetime_columns = ["indoor_temp_min_time", "indoor_temp_max_time",
+                        "gas_ert_min_time", "gas_ert_max_time",
+                        "water_ert_min_time", "water_ert_max_time",
+                        "egauge_min_time", "egauge_max_time"]
     for column in datetime_columns:
-        df[column] = df[column].dt.tz_convert(tz)
+        try:
+            df[column] = df[column].dt.tz_localize("UTC").dt.tz_convert(tz)
+        except TypeError:
+            df[column] = df[column].dt.tz_convert(tz)
 
     return df
 

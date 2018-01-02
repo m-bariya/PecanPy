@@ -6,3 +6,4 @@ Objects imported here will live in the `pecanpy` namespace.
 
 """
 from . api import *
+from . utils import *
