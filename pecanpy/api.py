@@ -19,6 +19,16 @@ def read_electricity_egauge_minutes_query(con: sqlalchemy.engine.Connectable,
                                           start_time: Union[pd.Timestamp, str],
                                           end_time: Union[pd.Timestamp, str],
                                           tz: str = "US/Central") -> pd.DataFrame:
+    """
+    Read electritity eguage data from a database into a `DataFrame`.
+
+    Parameters:
+    -----------
+
+    Returns:
+    --------
+
+    """
     template = """SELECT {columns} FROM {schema}.electricity_egauge_minutes
                   WHERE dataid={dataid} AND
                     localminute >= '{start_time}' AND
@@ -30,17 +40,9 @@ def read_electricity_egauge_minutes_query(con: sqlalchemy.engine.Connectable,
               "start_time": start_time,
               "end_time": end_time}
     query = template.format(**kwargs)
-    df = pd.read_sql_query(query, con=con, parse_dates=["localminute"])
-
-    # if the time period of interest contains observations only from within the
-    # same time-zone, then the parsed localminute column will be time-zone
-    # aware; otherwise not. Timestamps that are not time-zone aware need to be
-    # localized using tz_localize before being converted using tz_convert; time-
-    # zone aware timestamps can be converted straight away using tz_convert.
-    try:
-        df.localminute = df.localminute.dt.tz_localize("UTC").dt.tz_convert(tz)
-    except TypeError:  # raised by calling tz_localize on tz-aware localminute column
-        df.localminute = df.localminute.dt.tz_convert(tz)
+    parse_dates= {"localminute": {"utc": True}}
+    df = pd.read_sql_query(query, con=con, parse_dates=parse_dates)
+    df.localminute = df.localminute.dt.tz_convert(tz)
     df.set_index("localminute", inplace=True)
 
     return df
@@ -63,16 +65,7 @@ def read_gas_ert_query(con: sqlalchemy.engine.Connectable,
               "end_time": ert_end_time}
     query = template.format(kwargs)
     df = pd.read_sql_query(query, con=con, parse_dates=["readtime"])
-
-    # if the time period of interest contains observations only from within the
-    # same time-zone, then the parsed localminute column will be time-zone
-    # aware; otherwise not. Timestamps that are not time-zone aware need to be
-    # localized using tz_localize before being converted using tz_convert; time-
-    # zone aware timestamps can be converted straight away using tz_convert.
-    try:
-        df.readtime = df.readtime.dt.tz_localize("UTC").dt.tz_convert(tz)
-    except TypeError:  # raised by calling tz_localize on tz-aware localminute column
-        df.readtime = df.readtime.dt.tz_convert(tz)
+    df.readtime = df.readtime.dt.tz_convert(tz)
     df.set_index("readtime", inplace=True)
 
     return df
@@ -138,48 +131,30 @@ def read_water_ert_query(con: sqlalchemy.engine.Connectable,
               "end_time": ert_end_time}
     query = template.format(kwargs)
     df = pd.read_sql_query(query, con=con, parse_dates=["readtime"])
-
-    # if the time period of interest contains observations only from within the
-    # same time-zone, then the parsed readtime column will be time-zone
-    # aware; otherwise not. Timestamps that are not time-zone aware need to be
-    # localized using tz_localize before being converted using tz_convert; time-
-    # zone aware timestamps can be converted straight away using tz_convert.
-    try:
-        df.readtime = df.readtime.dt.tz_localize("UTC").dt.tz_convert(tz)
-    except TypeError:  # raised by calling tz_localize on tz-aware readtime column
-        df.readtime = df.readtime.dt.tz_convert(tz)
+    df.readtime = df.readtime.dt.tz_convert(tz)
     df.set_index("readtime", inplace=True)
 
     return df
 
 
-    def read_water_ert_capstone_query(con: sqlalchemy.engine.Connectable,
-                                      schema: str,
-                                      dataid: int,
-                                      start_time: Union[pd.Timestamp, str],
-                                      end_time: Union[pd.Timestamp, str],
-                                      tz: str = "US/Central")-> pd.DataFrame:
-        template = """SELECT localminute, consumption FROM {schema}.water_ert_capstone
-                      WHERE dataid={dataid} AND
-                        localminute >= '{start_time}' AND
-                        localminute < '{end_time}'
-                      ORDER BY localminute ASC;"""
-        kwargs = {"schema": schema,
-                  "dataid": dataid,
-                  "start_time": start_time,
-                  "end_time": ert_end_time}
-        query = template.format(kwargs)
-        df = pd.read_sql_query(query, con=con, parse_dates=["localminute"])
+def read_water_ert_capstone_query(con: sqlalchemy.engine.Connectable,
+                                  schema: str,
+                                  dataid: int,
+                                  start_time: Union[pd.Timestamp, str],
+                                  end_time: Union[pd.Timestamp, str],
+                                  tz: str = "US/Central")-> pd.DataFrame:
+    template = """SELECT localminute, consumption FROM {schema}.water_ert_capstone
+                  WHERE dataid={dataid} AND
+                    localminute >= '{start_time}' AND
+                    localminute < '{end_time}'
+                  ORDER BY localminute ASC;"""
+    kwargs = {"schema": schema,
+              "dataid": dataid,
+              "start_time": start_time,
+              "end_time": ert_end_time}
+    query = template.format(kwargs)
+    df = pd.read_sql_query(query, con=con, parse_dates=["localminute"])
+    df.localminute = df.localminute.dt.tz_convert(tz)
+    df.set_index("localminute", inplace=True)
 
-        # if the time period of interest contains observations only from within the
-        # same time-zone, then the parsed localminute column will be time-zone
-        # aware; otherwise not. Timestamps that are not time-zone aware need to be
-        # localized using tz_localize before being converted using tz_convert; time-
-        # zone aware timestamps can be converted straight away using tz_convert.
-        try:
-            df.localminute = df.localminute.dt.tz_localize("UTC").dt.tz_convert(tz)
-        except TypeError:  # raised by calling tz_localize on tz-aware localminute column
-            df.localminute = df.localminute.dt.tz_convert(tz)
-        df.set_index("localminute", inplace=True)
-
-        return df
+    return df
