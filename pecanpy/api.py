@@ -118,15 +118,37 @@ def read_survey_2012_all_participants_table(con: sqlalchemy.engine.Connectable,
     return df
 
 
+def read_survey_2012_field_descriptions_table(con: sqlalchemy.engine.Connectable,
+                                              schema: str) -> pd.DataFrame:
+    df = pd.read_sql_table("survey_2012_field_descriptions", con, schema,
+                           index_col=["column_name"])
+    return df
+
+
 def read_survey_2013_all_participants_table(con: sqlalchemy.engine.Connectable,
                                             schema: str) -> pd.DataFrame:
     df = pd.read_sql_table("survey_2013_all_participants", con, schema)
     return df
 
 
+def read_survey_2013_field_descriptions_table(con: sqlalchemy.engine.Connectable,
+                                              schema: str) -> pd.DataFrame:
+    df = pd.read_sql_table("survey_2013_field_descriptions", con, schema,
+                           index_col=["column_name"])
+    return df
+
+
 def read_survey_2014_all_participants_table(con: sqlalchemy.engine.Connectable,
                                             schema: str) -> pd.DataFrame:
     df = pd.read_sql_table("survey_2014_all_participants", con, schema)
+    return df
+
+
+def read_survey_2014_field_descriptions_table(con: sqlalchemy.engine.Connectable,
+                                              schema: str) -> pd.DataFrame:
+    df = pd.read_sql_table("survey_2014_field_descriptions", con, schema,
+                           index_col=["column_name"])
+    df.drop("id", axis=1, inplace=True)
     return df
 
 
