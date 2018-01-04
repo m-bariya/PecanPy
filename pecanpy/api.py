@@ -104,13 +104,29 @@ def read_metadata_table(con: sqlalchemy.engine.Connectable,
 
     return df
 
+def read_survey_2011_all_participants_table(con: sqlalchemy.engine.Connectable,
+                                            schema: str) -> pd.DataFrame:
+    df = pd.read_sql_table("survey_2011_all_participants", con, schema)
+    return df
 
-def read_survey_all_participants_table(con: sqlalchemy.engine.Connectable,
-                                       schema: str,
-                                       year: int) -> pd.DataFrame:
+
+def read_survey_2012_all_participants_table(con: sqlalchemy.engine.Connectable,
+                                            schema: str) -> pd.DataFrame:
     datetime_columns = ["start_time", "date_submitted"]
-    df = pd.read_sql_table("survey_{}_all_participants".format(year), con, schema,
-                           index_col="response_id", parse_dates=datetime_columns)
+    df = pd.read_sql_table("survey_2012_all_participants", con, schema,
+                           index_col=["response_id"], parse_dates=datetime_columns)
+    return df
+
+
+def read_survey_2013_all_participants_table(con: sqlalchemy.engine.Connectable,
+                                            schema: str) -> pd.DataFrame:
+    df = pd.read_sql_table("survey_2013_all_participants", con, schema)
+    return df
+
+
+def read_survey_2014_all_participants_table(con: sqlalchemy.engine.Connectable,
+                                            schema: str) -> pd.DataFrame:
+    df = pd.read_sql_table("survey_2014_all_participants", con, schema)
     return df
 
 
