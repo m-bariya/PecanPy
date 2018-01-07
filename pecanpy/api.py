@@ -128,6 +128,52 @@ def read_survey_2012_field_descriptions_table(con: sqlalchemy.engine.Connectable
 def read_survey_2013_all_participants_table(con: sqlalchemy.engine.Connectable,
                                             schema: str) -> pd.DataFrame:
     df = pd.read_sql_table("survey_2013_all_participants", con, schema)
+
+    # these variables are encoded as True/False but could also be 1/0.
+    df.primary_residence = df.primary_residence == "Yes"
+    df.foundation_pier_beam = df.foundation_pier_beam == "Pier and beam"
+    df.foundation_slab = df.foundation_slab == "Slab"
+    df.spend_time_at_home_monday = df.spend_time_at_home_monday == "Monday"
+    df.spend_time_at_home_tuesday = df.spend_time_at_home_tuesday == "Tuesday"
+    df.spend_time_at_home_wednesday = df.spend_time_at_home_wednesday == "Wednesday"
+    df.spend_time_at_home_thursday = df.spend_time_at_home_thursday == "Thursday"
+    df.spend_time_at_home_friday = df.spend_time_at_home_friday == "Friday"
+    df.spend_time_at_home_none = df.spend_time_at_home_none == "none"
+    df.ethnicity_asian_pacific_islander = df.ethnicity_asian_pacific_islander == "Asian/Pacific Islander"
+    df.ethnicity_black_african_american = df.ethnicity_black_african_american == "Black/African-American"
+    df.ethnicity_caucasian_other_than_hispanic_or_latino = df.ethnicity_caucasian_other_than_hispanic_or_latino == "Caucasian"
+    df.ethnicity_decline = df.ethnicity_decline == "Decline to Respond"
+    df.ethnicity_hispanic_or_latino = df.ethnicity_hispanic_or_latino == "Hispanic"
+    df.ethnicity_native_american_alaska_native = df.ethnicity_native_american_alaska_native == "American/Alaska Native"
+    df.ethnicity_other = df.ethnicity_other == "Other"
+    df.smart_phone_own = df.smart_phone_own == "Yes"
+    df.tablet_own = df.tablet_own == "Yes"
+    df.pv_system_own = df.pv_system_own == "Yes"
+    df.light_bulbs_cfl = df.light_bulbs_cfl == "CFL"
+    df.light_bulbs_fluorescent = df.light_bulbs_fluorescent == "Fluorescent"
+    df.light_bulbs_halogen = df.light_bulbs_halogen == "Halogen"
+    df.light_bulbs_incandescent = df.light_bulbs_incandescent == "Incandescent"
+    df.light_bulbs_led = df.light_bulbs_led == "LED"
+
+    # create categorical variables
+    df.month_moved_into_house = df.month_moved_into_house.astype("category")
+    df.education_level = df.education_level.astype("category")
+    df.total_annual_income = df.total_annual_income.astype("category")
+    df.typical_bulb_fans = df.typical_bulb_fans.astype("category")
+    df.typical_bulb_lamps = df.typical_bulb_lamps.astype("category")
+    df.electronic_devices_dvr_number = (df.electronic_devices_dvr_number
+                                          .replace({"None": 0})
+                                          .astype("category"))
+    df.electronic_devices_cable_box_number = (df.electronic_devices_cable_box_number
+                                                .replace({"None": 0, '': 0})
+                                                .astype("category"))
+    df.electronic_devices_game_system_number = (df.electronic_devices_game_system_number
+                                                  .replace({"None": 0, '': 0})
+                                                  .astype("category"))
+    df.electronic_devices_wifi_number = (df.electronic_devices_wifi_number
+                                           .replace({"None": 0, '': 0})
+                                           .astype("category"))
+
     return df
 
 
@@ -141,6 +187,29 @@ def read_survey_2013_field_descriptions_table(con: sqlalchemy.engine.Connectable
 def read_survey_2014_all_participants_table(con: sqlalchemy.engine.Connectable,
                                             schema: str) -> pd.DataFrame:
     df = pd.read_sql_table("survey_2014_all_participants", con, schema)
+
+    # these variables are encoded as True/False but could also be 1/0.
+    df.spend_time_at_home_monday = df.spend_time_at_home_monday == "Monday"
+    df.spend_time_at_home_tuesday = df.spend_time_at_home_tuesday == "Tuesday"
+    df.spend_time_at_home_wednesday = df.spend_time_at_home_wednesday == "Wednesday"
+    df.spend_time_at_home_thursday = df.spend_time_at_home_thursday == "Thursday"
+    df.spend_time_at_home_friday = df.spend_time_at_home_friday == "Friday"
+    df.spend_time_at_home_none = df.spend_time_at_home_none == "none"
+
+    # create the relevant categorical variables
+    df.programmable_thermostat_difficulty = (df.programmable_thermostat_difficulty
+                                               .replace({'': np.nan, "\"\"\"Haven't tried\"\"\"": np.nan})
+                                               .astype("category"))
+    df.electronic_devices_cable_box_number = (df.electronic_devices_cable_box_number
+                                                .replace({"None": 0, '': 0})
+                                                .astype("category"))
+    df.electronic_devices_game_system_number = (df.electronic_devices_game_system_number
+                                                  .replace({"None": 0, '': 0})
+                                                  .astype("category"))
+    df.electronic_devices_wifi_number = (df.electronic_devices_wifi_number
+                                           .replace({"None": 0, '': 0})
+                                           .astype("category"))
+
     return df
 
 
