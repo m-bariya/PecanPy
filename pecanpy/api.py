@@ -132,86 +132,231 @@ def read_survey_2013_all_participants_table(con: sqlalchemy.engine.Connectable,
     df = pd.read_sql_table("survey_2013_all_participants", con, schema)
 
     # these variables are encoded as True/False but could also be 1/0.
-    df.primary_residence = df.primary_residence == "Yes"
-    df.foundation_pier_beam = df.foundation_pier_beam == "Pier and beam"
-    df.foundation_slab = df.foundation_slab == "Slab"
-    df.smartphone_own = df.smartphone_own == "Yes"
-    df.tablet_own = df.tablet_own == "Yes"
-    df.pv_system_own = df.pv_system_own == "Yes"
-    df.retrofits = df.retrofits == "Yes"
-    df.care_energy_cost = df.care_energy_cost == "Yes"
-    df.reduce_energy_cost = df.reduce_energy_cost == "Yes"
-    df.modify_routines = df.modify_routines == "Yes"
-    df.pets = df.pets == "Yes"
-    df.irrigation_system = df.irrigation_system == "Yes"
-    df.ac_service_package = df.ac_service_package == "Yes"
-    df.light_bulbs_cfl = df.light_bulbs_cfl == "CFL"
-    df.light_bulbs_fluorescent = df.light_bulbs_fluorescent == "Fluorescent"
-    df.light_bulbs_halogen = df.light_bulbs_halogen == "Halogen"
-    df.light_bulbs_incandescent = df.light_bulbs_incandescent == "Incandescent"
-    df.light_bulbs_led = df.light_bulbs_led == "LED"
-    df.house_num_rooms = df.house_num_rooms.astype("float64")
-    df.house_square_feet = df.house_square_feet.astype("float64")
+    # merge the two foundation columns into single categorical columns
+    dtype = types.CategoricalDtype(categories=["Pier and beam", "Slab", "Both"],
+                                   ordered=False)
+    df["foundation"] = (df.apply(_merge_foundation_columns, axis=1)
+                          .astype(dtype))
+    df.drop(["foundation_pier_beam", "foundation_slab"], axis=1, inplace=True)
 
     for column in df:
-        if column.startswith("spend_time_at_home_"):
+        if column == "primary_residence":
+            df[column] = df[column].replace({"Yes": True, "No": False})
+        elif column == "number_floors":
+            dtype = types.CategoricalDtype(categories=[1,2,3,4], ordered=True)
+            strs_to_ints = {"One": 1, "Two": 2, "Three": 3, "Four": 4}
+            df[column] = (df[column].replace(strs_to_ints)
+                                    .astype(dtype))
+        elif column == "year_moved_into_house":
+            categories = range(1958, 2018)
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = (df[column].apply(lambda v: int(v) if v is not None else v)
+                                    .astype(dtype))
+        elif column == "month_moved_into_house":
+            categories = ["January", "February", "March", "April", "May", "June",
+                          "July", "August", "September", "October", "November",
+                          "December"]
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = df[column].astype(dtype)
+        elif column == "year_house_constructed":
+            categories = range(1930, 2018)
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = (df[column].replace({"1930 or earlier": "1930"})
+                                    .apply(lambda v: int(v) if v is not None else v)
+                                    .astype(dtype))
+        elif column == "house_num_rooms":
+            categories = range(1, 17)
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = (df[column].apply(lambda v: int(v) if v is not None else v)
+                                    .astype(dtype))
+        elif column == "house_ceiling_height":
+            df.drop(column, axis=1, inplace=True)  # needs substantial cleaning!
+        elif column == "house_square_feet":
+            df[column] = df[column].astype("float64")
+        elif column.startswith("spend_time_at_home_"):
             df[column] = df[column].notnull()
-        if column.startswith("ethnicity_"):
+        elif column.startswith("ethnicity_"):
             df[column] = df[column].notnull()
-        if column.startswith("hvac_"):
-            df[column] = df[column].notnull()
-        if column.startswith("heating_"):
-            df[column] = df[column].notnull()
-        if column.startswith("ac_cooling_"):
-            df[column] = df[column].notnull()
-        if column.startswith("appliance_"):
-            df[column] = (df[column].replace({"N/A": np.nan})
-                                    .astype("category"))
-        if column.startswith("electronic_devices_"):
-            df[column] = (df[column].replace({"None": '0', '': '0'})
-                                    .astype("category"))
-        if column.startswith("sex_"):
-            df[column] = (df[column].replace({"None": '0'})
-                                    .astype("category"))
-        if column.startswith("cooking_"):
-            if column.endswith("_times"):
-                df[column] = (df[column].replace({"None": np.nan})
-                                        .astype("category"))
-            else:
-                df[column] = df[column].notnull()
-        if column.endswith("_count"):
-            df[column] = (df[column].replace({None: '0', "N/A": '0'})
-                                    .astype("int64"))
-        if column.startswith("residents_"):
+        elif column.startswith("sex_"):
             dtype = types.CategoricalDtype(categories=[0, 1, 2, 3, 4, 5],
                                            ordered=True)
             strs_with_ints = {None: 0, '1': 1, '2': 2, '3': 3, '4': 4, "5 or more": 5}
             df[column] = (df[column].replace(strs_with_ints)
                                     .astype(dtype))
-        # TODO these columns need to be parsed using regex in order to be useful!
-        if column.endswith("_brand") or column.endswith("_models"):
-            df[column] = df[column].astype("category")
-        if column.startswith("temp_"):
+        elif column.startswith("residents_"):
+            dtype = types.CategoricalDtype(categories=[0, 1, 2, 3, 4, 5],
+                                           ordered=True)
+            strs_with_ints = {None: 0, '1': 1, '2': 2, '3': 3, '4': 4, "5 or more": 5}
+            df[column] = (df[column].replace(strs_with_ints)
+                                    .astype(dtype))
+        elif column == "education_level":
+            categories = ["High School graduate",
+                          "Some college/trade/vocational school",
+                          "College graduate",
+                          "Postgraduate degree"]
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = df[column].astype(dtype)
+        elif column == "total_annual_income":
+            categories = ["Less than $10,000", "$10,000 - $19,999",
+                          "$20,000 - $34,999", "$35,000 - $49,999",
+                          "$50,000 - $74,999", "$75,000 - $99,999",
+                          "$100,000 - $149,999", "$150,000 - $299,000",
+                          "$300,000 - $1,000,000", "more than $1,000,000"]
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = (df[column].str
+                                    .replace('-', ',')
+                                    .str
+                                    .replace(" , ", " - ")
+                                    .astype(dtype))
+        elif column == "smartphone_own":
+            df[column] = df[column].replace({"Yes": True, "No": False})
+        elif column == "tablet_own":
+            df[column] = df[column].replace({"Yes": True, "No": False})
+        elif column == "pv_system_own":
+            df[column] = df[column].replace({"Yes": True, "No": False})
+        elif column == "pv_system_size":
+            specific_replacements = {"5kw I think": 5.0,
+                                     "8060 Watts": 8.060,
+                                     "20W (solar powered attic fan)": 0.020}
+            str_to_numeric =  pd.to_numeric(df.pv_system_size
+                                              .str
+                                              .replace(' ', '')
+                                              .str
+                                              .replace("kw", '', case=False)
+                                              .replace(specific_replacements),
+                                              errors="coerce")
+            df[column] = str_to_numeric.apply(lambda v: v / 1e3 if v > 1e3 else v)
+        elif column == "electricity_used_monthly":
+            pass  # TODO column needs significant cleaning!
+        elif column == "gas_used_monthly":
+            pass # TODO column needs significant cleaning!
+        elif column == "retrofits":
+            df[column] = df[column].replace({"Yes": True, "No": False})
+        elif column == "retrofits_detail":
+            df.drop(column, axis=1, inplace=True)
+        elif column == "retrofits_reason":
+            df[column] = df[column].replace({"Yes": True, "No": False, "N/A": None})
+        elif column.startswith("appliance_"):
+            categories = ['rarely', 'once or twice a month',
+                          'once or twice a week', 'several times a week',
+                          'daily basis']
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = (df[column].replace({"N/A": None})
+                                    .astype(dtype))
+        elif column == "irrigation_system":
+            df[column] = df[column].replace({"Yes": True, "No": False})
+        elif column == "cooking_weekdays_times":
+            categories = ["None", "Less than 1 hour", "An hour or more"]
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = df[column].astype(dtype)
+        elif column == "cooking_weekends_times":
+            categories = ["None", "Less than 1 hour", "An hour or more"]
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = df[column].astype(dtype)
+        elif column.startswith("cooking_"):
+            df[column] = df[column].notnull()
+        elif column.startswith("blinds_"):
+            categories = ['Rarely or never', 'Some days', 'Most days']
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = df[column].astype(dtype)
+        elif column == "thermostat_settings":
+            categories = ["We are generally in agreement",
+                          "Our preferences vary 1-2 degrees Fahrenheit",
+                          "Our preferences vary 3-5 degrees Fahrenheit",
+                          "Our preferences vary more than 5 degrees Fahrenheit"]
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = df[column].astype(dtype)
+        elif column == "tv_hours":
+            categories = range(0, 12)
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            strs_with_ints = {None: 0, '1': 1, '2': 2, '3': 3, '4': 4, '5': 5,
+                              '6': 6, '7': 7, '8': 8, '9': 9, "10": 10,
+                              "10 or more": 11}
+            df[column] = (df[column].replace(strs_with_ints)
+                                    .astype(dtype))
+        elif column == "care_energy_cost":
+            df[column] = df[column].replace({"Yes": True, "No": False})
+        elif column == "reduce_energy_cost":
+            df[column] = df[column].replace({"Yes": True, "No": False})
+        elif column == "reduce_energy_yes":
+            df.drop(column, axis=1, inplace=True)  # TODO substantial work required to make this useful!
+        elif column == "modify_routines":
+            df[column] = df[column].replace({"Yes": True, "No": False})
+        elif column.endswith("_brand") or column.endswith("_models"):
+            df.drop(column, axis=1, inplace=True)
+        elif column.startswith("hvac_"):
+            df[column] = df[column].notnull()
+        elif column.startswith("compressor1_"):
+            df.drop(column, axis=1, inplace=True)
+        elif column.startswith("compressor2_"):
+            df.drop(column, axis=1, inplace=True)
+        elif column.startswith("compressor3_"):
+            df.drop(column, axis=1, inplace=True)
+        elif column.startswith("air_handler1_"):
+            df.drop(column, axis=1, inplace=True)
+        elif column.startswith("air_handler2_"):
+            df.drop(column, axis=1, inplace=True)
+        elif column.startswith("heating_"):
+            df[column] = df[column].notnull()
+        elif column.startswith("temp_"):
             df[column] = pd.to_numeric(df[column], errors="coerce")
+        elif column == "pets":
+            df[column] = df[column].replace({"Yes": True, "No": False})
+        elif column == "programmable_thermostat_currently_programmed":
+            df[column] = df[column].replace({"Yes": True, "No": False, "I dont know": None})
+        elif column == "programmable_thermostat_difficultly": # typo in name!
+            categories = ["Havent tried", "Easy", "Moderately difficult", "Very difficult"]
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df["programmable_thermostat_difficulty"] = df[column].astype(dtype)
+            df.drop(column, axis=1, inplace=True)
+        elif column == "ac_comfortability":
+            dtype = types.CategoricalDtype([1,2,3,4,5], ordered=True)
+            strs_with_ints = {'1': 1, '2': 2, '3': 3, '4': 4, '5': 5}
+            df[column] = (df[column].replace(strs_with_ints)
+                                    .astype(dtype))
+        elif column == "house_drafty":
+            categories = ["No", "Somewhat", "Yes"]
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = (df[column].replace({"I dont know/Havent noticed": None})
+                                    .astype(dtype))
+        elif column.startswith("ac_cooling_"):
+            df[column] = df[column].notnull()
+        elif column == "change_ac_filters":
+            categories = ["Every year or greater", "Every 6-12 months",
+                          "Every 4-6 months", "Every 2-3 months",
+                          "At least once every month"]
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = (df[column].replace({"There is an HVAC filter!?": None})
+                                    .astype(dtype))
+        elif column == "ac_service_package":
+            df[column] = df[column].replace({"Yes": True, "No": False})
+        elif column.startswith("ac_service_package_cost"):
+            df.drop(column, axis=1, inplace=True)
+        elif column == "ac_service_date":
+            categories = ["Less than a year ago",  "1-2 years ago",
+                          "2-3 years ago", "3-5 years ago", "Never"]
+            dtype = types.CategoricalDtype(categories, ordered=True)
+            df[column] = (df[column].replace({"I dont know": None})
+                                    .astype(dtype))
+        elif column == "water_heater_tankless":
+            df[column] = df[column].replace({"Yes": True, "No": False})
+        elif column.startswith("light_bulbs_"):
+            df[column] = df[column].notnull()
+        elif column.startswith("electronic_devices_"):
+            dtype = types.CategoricalDtype(categories=[0, 1, 2, 3, 4, 5],
+                                           ordered=True)
+            strs_with_ints = {None: 0, '1': 1, '2': 2, '3': 3, '4': 4, "5 or more": 5}
+            df[column] = (df[column].replace(strs_with_ints)
+                                    .astype(dtype))
+        elif column.endswith("_number"):
+            df.drop(column, axis=1, inplace=True)
+        elif column == "recessed_lights_location":
+            df.drop(column, axis=1, inplace=True)
+        elif column == "track_lights_location":
+            df.drop(column, axis=1, inplace=True)
+        else:
+            pass
 
-    # create categorical variables
-    df.year_house_constructed = df.year_house_constructed.astype("category")
-    df.year_moved_into_house = df.year_moved_into_house.astype("category")
-    df.number_floors = df.number_floors.astype("category")
-    df.month_moved_into_house = df.month_moved_into_house.astype("category")
-    df.education_level = df.education_level.astype("category")
-    df.total_annual_income = df.total_annual_income.astype("category")
-    df.blinds_summer = df.blinds_summer.astype("category")
-    df.blinds_winter = df.blinds_winter.astype("category")
-    df.thermostat_settings = df.thermostat_settings.astype("category")
-    df.tv_hours = df.tv_hours.astype("category")
-    df.typical_bulb_fans = df.typical_bulb_fans.astype("category")
-    df.typical_bulb_lamps = df.typical_bulb_lamps.astype("category")
-    df.house_drafty = df.house_drafty.astype("category")
-    df.ac_comfortability = df.ac_comfortability.astype("category")
-    df.ac_service_date = df.ac_service_date.astype("category")
-    df.programmable_thermostat_difficultly = df.programmable_thermostat_difficultly.astype("category")
-    df.change_ac_filters = df.change_ac_filters.astype("category")
     return df
 
 
@@ -229,15 +374,6 @@ def read_survey_2014_all_participants_table(con: sqlalchemy.engine.Connectable,
     # merge the two foundation columns into single categorical columns
     dtype = types.CategoricalDtype(categories=["Pier and beam", "Slab", "Both"],
                                    ordered=False)
-    def _merge_foundation_columns(row):
-        if row.foundation_pier_beam == '':
-            value = "Slab" if row.foundation_slab == "Slab" else None
-        elif row.foundation_pier_beam == "Pier and beam" and row.foundation_slab == '':
-            value = "Pier and beam"
-        else:
-            value = "Both"
-        return value
-
     df["foundation"] = (df.apply(_merge_foundation_columns, axis=1)
                           .astype(dtype))
     df.drop(["foundation_pier_beam", "foundation_slab"], axis=1, inplace=True)
@@ -263,21 +399,21 @@ def read_survey_2014_all_participants_table(con: sqlalchemy.engine.Connectable,
             df[column] = (df[column].replace(strs_with_ints)
                                     .astype(dtype))
         elif column == "education_level":
-            categories = ['College graduate',
-                          'Postgraduate degree',
-                          'Some college/trade/vocational school',
-                          'High School graduate']
-            dtype = types.CategoricalDtype(categories, ordered=False)
+            categories = ["High School graduate",
+                          "Some college/trade/vocational school",
+                          "College graduate",
+                          "Postgraduate degree"]
+            dtype = types.CategoricalDtype(categories, ordered=True)
             df[column] = df[column].astype(dtype)
         elif column == "total_annual_income":
-            categories = ['"Less than $10,000"', '"$10,000 - $19,999"',
-                          '"$20,000 - $34,999"', '"$35,000 - $49,999"',
-                          '"$50,000 - $74,999"', '"$75,000 - $99,999"',
-                          '"$100,000 - $149,999"', '"$150,000 - $299,000"',
-                          '"$300,000 - $1,000,000"', '"more than $1,000,000"']
+            categories = ["Less than $10,000", "$10,000 - $19,999",
+                          "$20,000 - $34,999", "$35,000 - $49,999",
+                          "$50,000 - $74,999", "$75,000 - $99,999",
+                          "$100,000 - $149,999", "$150,000 - $299,000",
+                          "$300,000 - $1,000,000", "more than $1,000,000"]
             dtype = types.CategoricalDtype(categories, ordered=True)
             df[column] = (df[column].str
-                                    .replace('"""', '"')
+                                    .replace('"""', '')
                                     .replace({'': None})
                                     .astype(dtype))
         elif column == "pv_system_own":
@@ -420,3 +556,13 @@ def read_water_ert_capstone_query(con: sqlalchemy.engine.Connectable,
     df.set_index("localminute", inplace=True)
 
     return df
+
+
+def _merge_foundation_columns(row):
+    if row.foundation_pier_beam == '' or row.foundation_pier_beam is None:
+        value = "Slab" if row.foundation_slab == "Slab" else None
+    elif row.foundation_pier_beam == "Pier and beam" and (row.foundation_slab == '' or row.foundation_slab is None):
+        value = "Pier and beam"
+    else:
+        value = "Both"
+    return value
