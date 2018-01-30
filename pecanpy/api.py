@@ -81,35 +81,6 @@ def read_electricity_egauge_minutes_query(con: sqlalchemy.engine.Connectable,
     return results_df
 
 
-def read_electricity_egauge_5min_query(con: sqlalchemy.engine.Connectable,
-                                       schema: str,
-                                       dataid: int,
-                                       start_time: Union[pd.Timestamp, str],
-                                       end_time: Union[pd.Timestamp, str],
-                                       columns: Union[List[str], str] = "all",
-                                       tz: str = "US/Central") -> pd.DataFrame:
-    """
-    Read 5-minute electricity egauge data from a database into a `DataFrame`.
-
-    Parameters:
-    -----------
-
-    Returns:
-    --------
-
-    """
-    results_df = _read_electricity_egauge_query(con,
-                                                schema,
-                                                "electricity_egauge_5min",
-                                                "local_5min",
-                                                dataid,
-                                                start_time,
-                                                end_time,
-                                                columns,
-                                                tz)
-    return results_df
-
-
 def read_electricity_egauge_15min_query(con: sqlalchemy.engine.Connectable,
                                         schema: str,
                                         dataid: int,
@@ -131,35 +102,6 @@ def read_electricity_egauge_15min_query(con: sqlalchemy.engine.Connectable,
                                                 schema,
                                                 "electricity_egauge_15min",
                                                 "local_15min",
-                                                dataid,
-                                                start_time,
-                                                end_time,
-                                                columns,
-                                                tz)
-    return results_df
-
-
-def read_electricity_egauge_30min_query(con: sqlalchemy.engine.Connectable,
-                                        schema: str,
-                                        dataid: int,
-                                        start_time: Union[pd.Timestamp, str],
-                                        end_time: Union[pd.Timestamp, str],
-                                        columns: Union[List[str], str] = "all",
-                                        tz: str = "US/Central") -> pd.DataFrame:
-    """
-    Read 30-minute electricity egauge data from a database into a `DataFrame`.
-
-    Parameters:
-    -----------
-
-    Returns:
-    --------
-
-    """
-    results_df = _read_electricity_egauge_query(con,
-                                                schema,
-                                                "electricity_egauge_30min",
-                                                "local_30min",
                                                 dataid,
                                                 start_time,
                                                 end_time,
