@@ -14,6 +14,47 @@ from pandas.api import types
 import sqlalchemy
 
 
+def read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
+                                  schema: str,
+                                  dataid: int,
+                                  start_time: Union[pd.Timestamp, str],
+                                  end_time: Union[pd.Timestamp, str],
+                                  columns: Union[List[str], str] = "all",
+                                  freq: str = 'T',
+                                  tz: str = "US/Central") -> pd.DataFrame:
+    """
+    Read electricity egauge minutes data from a database into a `DataFrame`.
+
+    Parameters:
+    -----------
+
+    Returns:
+    --------
+
+    """
+    kwargs = {"con": con, "schema": schema, "dataid": dataid,
+              "start_time": start_time, "end_time": end_time,
+              "columns": columns, "tz": tz}
+    if freq == 'T':
+        minutes_kwargs = {"table": "electricity_egauge_minutes",
+                          "local_minute": "localminute"}
+        kwargs.update(minutes_kwargs)
+    elif freq == "15T":
+        qtr_hour_kwargs = {"table": "electricity_egauge_15min",
+                           "local_minute": "local_15min"}
+        kwargs.update(qtr_hour_kwargs)
+    elif freq == 'H':
+        hour_kwargs = {"table": "electricity_egauge_15min",
+                       "local_minute": "localhour"}
+        kwargs.update(hour_kwargs)
+    else:
+        msg = """The 'freq' keyword argument must be one of 'T' (minutes),
+                 '15T' (15 minutes), or 'H' (hourly)."""
+        raise ValueError(msg)
+    results_df = _read_electricity_egauge_query(**kwargs)
+    return results_df
+
+
 def _read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
                                    schema: str,
                                    table: str,
@@ -51,90 +92,3 @@ def _read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
     df[local_minute] = df[local_minute].dt.tz_convert(tz)
     df.set_index(local_minute, inplace=True)
     return df
-
-
-def read_electricity_egauge_minutes_query(con: sqlalchemy.engine.Connectable,
-                                          schema: str,
-                                          dataid: int,
-                                          start_time: Union[pd.Timestamp, str],
-                                          end_time: Union[pd.Timestamp, str],
-                                          columns: Union[List[str], str] = "all",
-                                          tz: str = "US/Central") -> pd.DataFrame:
-    """
-    Read electricity egauge minutes data from a database into a `DataFrame`.
-
-    Parameters:
-    -----------
-
-    Returns:
-    --------
-
-    """
-    results_df = _read_electricity_egauge_query(con,
-                                                schema,
-                                                "electricity_egauge_minutes",
-                                                "localminute",
-                                                dataid,
-                                                start_time,
-                                                end_time,
-                                                columns,
-                                                tz)
-    return results_df
-
-
-def read_electricity_egauge_15min_query(con: sqlalchemy.engine.Connectable,
-                                        schema: str,
-                                        dataid: int,
-                                        start_time: Union[pd.Timestamp, str],
-                                        end_time: Union[pd.Timestamp, str],
-                                        columns: Union[List[str], str] = "all",
-                                        tz: str = "US/Central") -> pd.DataFrame:
-    """
-    Read 15-minute electricity egauge data from a database into a `DataFrame`.
-
-    Parameters:
-    -----------
-
-    Returns:
-    --------
-
-    """
-    results_df = _read_electricity_egauge_query(con,
-                                                schema,
-                                                "electricity_egauge_15min",
-                                                "local_15min",
-                                                dataid,
-                                                start_time,
-                                                end_time,
-                                                columns,
-                                                tz)
-    return results_df
-
-
-def read_electricity_egauge_hours_query(con: sqlalchemy.engine.Connectable,
-                                        schema: str,
-                                        dataid: int,
-                                        start_time: Union[pd.Timestamp, str],
-                                        end_time: Union[pd.Timestamp, str],
-                                        columns: Union[List[str], str] = "all",
-                                        tz: str = "US/Central") -> pd.DataFrame:
-    """
-    Read one hour electricity egauge data from a database into a `DataFrame`.
-
-    Parameters:
-    -----------
-
-    Returns:
-    --------
-
-    """
-    results_df = _read_electricity_egauge_query(con,
-                                                schema,
-                                                "electricity_egauge_hours",
-                                                "localhour",
-                                                dataid,
-                                                start_time,
-                                                end_time,
-                                                columns,
-                                                tz)
-    return results_df
