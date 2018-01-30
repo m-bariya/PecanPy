@@ -25,7 +25,7 @@ if db_source == 'dataport':
 	dp_base = "postgres"
 	dp_host = "dataport.cloud"
 	dp_port = 5434
-	dp_user = "mHYl5sJ5Xavb"
+	dp_user = "
 	dp_pwrd = ""
 	db_schema = "commercial"
 elif db_source == 'kapsarc':
@@ -33,7 +33,7 @@ elif db_source == 'kapsarc':
 	dp_base = "pecan_raw"
 	dp_host = "helium-63.test.kapsarc"
 	dp_port = 5432
-	dp_user = "howej"
+	dp_user = ""
 	dp_pwrd = ""
 	db_schema = "public"
 
