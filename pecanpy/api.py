@@ -13,15 +13,17 @@ from pandas.api import types
 import sqlalchemy
 
 
-def read_electricity_egauge_minutes_query(con: sqlalchemy.engine.Connectable,
-                                          schema: str,
-                                          columns: Union[List[str], str],
-                                          dataid: int,
-                                          start_time: Union[pd.Timestamp, str],
-                                          end_time: Union[pd.Timestamp, str],
-                                          tz: str = "US/Central") -> pd.DataFrame:
+def _read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
+                                   schema: str,
+                                   table: str,
+                                   local_minute: str,
+                                   dataid: int,
+                                   start_time: Union[pd.Timestamp, str],
+                                   end_time: Union[pd.Timestamp, str],
+                                   columns: Union[List[str], str],
+                                   tz: str) -> pd.DataFrame:
     """
-    Read electritityegauge data from a database into a `DataFrame`.
+    Read electricity egauge data from a database into a `DataFrame`.
 
     Parameters:
     -----------
@@ -30,34 +32,64 @@ def read_electricity_egauge_minutes_query(con: sqlalchemy.engine.Connectable,
     --------
 
     """
-    template = """SELECT {columns} FROM {schema}.electricity_egauge_minutes
+    template = """SELECT {columns} FROM {schema}.{table}
                   WHERE dataid={dataid} AND
-                    localminute >= '{start_time}' AND
-                    localminute < '{end_time}'
-                  ORDER BY localminute ASC;"""
-    kwargs = {"columns": '*' if columns == "all" else ", ".join(["localminute"] + columns),
+                    {local_minute} >= '{start_time}' AND
+                    {local_minute} < '{end_time}'
+                  ORDER BY {local_minute} ASC;"""
+    kwargs = {"columns": '*' if columns == "all" else ", ".join([local_minute] + columns),
               "schema": schema,
+              "table": table,
+              "local_minute": local_minute,
               "dataid": dataid,
               "start_time": start_time,
               "end_time": end_time}
     query = template.format(**kwargs)
-    parse_dates= {"localminute": {"utc": True}}
+    parse_dates= {local_minute: {"utc": True}}
     df = pd.read_sql_query(query, con=con, parse_dates=parse_dates)
-    df.localminute = df.localminute.dt.tz_convert(tz)
-    df.set_index("localminute", inplace=True)
-
+    df[local_minute] = df[local_minute].dt.tz_convert(tz)
+    df.set_index(local_minute, inplace=True)
     return df
+
+
+def read_electricity_egauge_minutes_query(con: sqlalchemy.engine.Connectable,
+                                          schema: str,
+                                          dataid: int,
+                                          start_time: Union[pd.Timestamp, str],
+                                          end_time: Union[pd.Timestamp, str],
+                                          columns: Union[List[str], str] = "all",
+                                          tz: str = "US/Central") -> pd.DataFrame:
+    """
+    Read electricity egauge minutes data from a database into a `DataFrame`.
+
+    Parameters:
+    -----------
+
+    Returns:
+    --------
+
+    """
+    results_df = _read_electricity_egauge_query(con,
+                                                schema,
+                                                "electricity_egauge_minutes",
+                                                "localminute",
+                                                dataid,
+                                                start_time,
+                                                end_time,
+                                                columns,
+                                                tz)
+    return results_df
 
 
 def read_electricity_egauge_15min_query(con: sqlalchemy.engine.Connectable,
                                         schema: str,
-                                        columns: Union[List[str], str],
                                         dataid: int,
                                         start_time: Union[pd.Timestamp, str],
                                         end_time: Union[pd.Timestamp, str],
+                                        columns: Union[List[str], str] = "all",
                                         tz: str = "US/Central") -> pd.DataFrame:
     """
-    Read electricityegauge 15-minute data from a database into a `DataFrame`.
+    Read 15-minute electricity egauge data from a database into a `DataFrame`.
 
     Parameters:
     -----------
@@ -66,34 +98,27 @@ def read_electricity_egauge_15min_query(con: sqlalchemy.engine.Connectable,
     --------
 
     """
-    template = """SELECT {columns} FROM {schema}.electricity_egauge_15min
-                  WHERE dataid={dataid} AND
-                    local_15min >= '{start_time}' AND
-                    local_15min < '{end_time}'
-                  ORDER BY local_15min ASC;"""
-    kwargs = {"columns": '*' if columns == "all" else ", ".join(["local_15min"] + columns),
-              "schema": schema,
-              "dataid": dataid,
-              "start_time": start_time,
-              "end_time": end_time}
-    query = template.format(**kwargs)
-    parse_dates= {"local_15min": {"utc": True}}
-    df = pd.read_sql_query(query, con=con, parse_dates=parse_dates)
-    df.local_15min = df.local_15min.dt.tz_convert(tz)
-    df.set_index("local_15min", inplace=True)
-
-    return df
+    results_df = _read_electricity_egauge_query(con,
+                                                schema,
+                                                "electricity_egauge_15min",
+                                                "local_15min",
+                                                dataid,
+                                                start_time,
+                                                end_time,
+                                                columns,
+                                                tz)
+    return results_df
 
 
 def read_electricity_egauge_hours_query(con: sqlalchemy.engine.Connectable,
                                         schema: str,
-                                        columns: Union[List[str], str],
                                         dataid: int,
                                         start_time: Union[pd.Timestamp, str],
                                         end_time: Union[pd.Timestamp, str],
+                                        columns: Union[List[str], str] = "all",
                                         tz: str = "US/Central") -> pd.DataFrame:
     """
-    Read electricity egauge hourly data from a database into a `DataFrame`.
+    Read one hour electricity egauge data from a database into a `DataFrame`.
 
     Parameters:
     -----------
@@ -102,23 +127,16 @@ def read_electricity_egauge_hours_query(con: sqlalchemy.engine.Connectable,
     --------
 
     """
-    template = """SELECT {columns} FROM {schema}.electricity_egauge_hours
-                  WHERE dataid={dataid} AND
-                    localhour >= '{start_time}' AND
-                    localhour < '{end_time}'
-                  ORDER BY localhour ASC;"""
-    kwargs = {"columns": '*' if columns == "all" else ", ".join(["localhour"] + columns),
-              "schema": schema,
-              "dataid": dataid,
-              "start_time": start_time,
-              "end_time": end_time}
-    query = template.format(**kwargs)
-    parse_dates= {"localhour": {"utc": True}}
-    df = pd.read_sql_query(query, con=con, parse_dates=parse_dates)
-    df.localhour = df.localhour.dt.tz_convert(tz)
-    df.set_index("localhour", inplace=True)
-
-    return df
+    results_df = _read_electricity_egauge_query(con,
+                                                schema,
+                                                "electricity_egauge_hours",
+                                                "localhour",
+                                                dataid,
+                                                start_time,
+                                                end_time,
+                                                columns,
+                                                tz)
+    return results_df
 
 
 def read_gas_ert_query(con: sqlalchemy.engine.Connectable,
