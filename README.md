@@ -8,7 +8,7 @@ First, install the [Git](https://git-scm.com/downloads) version control system a
 Open a terminal and run the following command...
 
 ```bash
-$ conda env -f environment.yml
+$ conda env create -f environment.yml
 ```
 
 ...which uses `conda` to create a clean virtual development environment with
