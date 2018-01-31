@@ -5,6 +5,6 @@ dependencies:
   - jupyter
   - matplotlib
   - numpy
-  - pandas
+  - pandas >= 0.22
   - psycopg2
   - sqlalchemy
