@@ -23,13 +23,22 @@ def read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
                                   freq: str = 'T',
                                   tz: str = "US/Central") -> pd.DataFrame:
     """
-    Read electricity egauge minutes data from a database into a `DataFrame`.
+    Read electricity egauge data from a database into a `DataFrame`.
 
     Parameters:
     -----------
+    con: `sqlalchemy.engine.Connectable`
+    schema: `str`
+    dataid: `int`
+    start_time: `Union[pd.Timestamp, str]`
+    end_time: `Union[pd.Timestamp, str]`
+    columns: `Union[List[str], str]`, default: "all"
+    freq: `str`, default: 'T'
+    tz: `str`, default: "US/Central"
 
     Returns:
     --------
+    results_df: `pandas.DataFrame`
 
     """
     kwargs = {"con": con, "schema": schema, "dataid": dataid,
@@ -44,7 +53,7 @@ def read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
                            "local_minute": "local_15min"}
         kwargs.update(qtr_hour_kwargs)
     elif freq == 'H':
-        hour_kwargs = {"table": "electricity_egauge_15min",
+        hour_kwargs = {"table": "electricity_egauge_hours",
                        "local_minute": "localhour"}
         kwargs.update(hour_kwargs)
     else:
