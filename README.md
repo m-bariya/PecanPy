@@ -1,8 +1,6 @@
 # PecanPy
 
-Python API for the Pecan Street Dataport.  This Python package is Intended for
-use by KAPSARC researchers.  A future version of this package should be released
-via PyPI for outside researchers.
+Python API for the Pecan Street Dataport.
 
 ## Installation
 First, install the [Git](https://git-scm.com/downloads) version control system and [clone](https://help.github.com/articles/cloning-a-repository/) this repository onto your local machine. Next, install the [Conda](https://conda.io/docs/user-guide/install/index.html) package and environment management system.
