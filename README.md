@@ -1,6 +1,6 @@
 # PecanPy
 
-Python API for the Pecan Street Dataport.
+Python API for the Pecan Street [Dataport](https://dataport.cloud/).
 
 ## Installation
 First, install the [Git](https://git-scm.com/downloads) version control system and [clone](https://help.github.com/articles/cloning-a-repository/) this repository onto your local machine. Next, install the [Conda](https://conda.io/docs/user-guide/install/index.html) package and environment management system.
