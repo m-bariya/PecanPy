@@ -19,6 +19,27 @@ def read_gas_ert_query(con: sqlalchemy.engine.Connectable,
                        start_time: Union[pd.Timestamp, str],
                        end_time: Union[pd.Timestamp, str],
                        tz: str = "US/Central")-> pd.DataFrame:
+    """
+    Read gas ERT data from a database into a `pandas.DataFrame`.
+
+    Parameters
+    ----------
+    con : `sqlalchemy.engine.Connectable`
+    schema : `str`
+        Name of a schema containing the `gas_ert` table/view.
+    dataid : `int`
+        The unique identifier for a particular household.
+    start_time : `Union[pd.Timestamp, str]`
+    end_time : `Union[pd.Timestamp, str]`
+    tz : `str`, default: "US/Central"
+
+    Returns
+    -------
+    df: `pandas.DataFrame`
+
+        Gas ERT data for a particular household.
+
+    """
     template = """SELECT readtime, meter_value FROM {schema}.gas_ert
                   WHERE dataid={dataid} AND
                     readtime >= '{start_time}' AND
@@ -38,6 +59,22 @@ def read_gas_ert_query(con: sqlalchemy.engine.Connectable,
 
 def read_electric_vehicles_table(con: sqlalchemy.engine.Connectable,
                                  schema: str) -> pd.DataFrame:
+    """
+    Read electric vehicles table from a database into a `pandas.DataFrame`.
+
+    Parameters
+    ----------
+    con : `sqlalchemy.engine.Connectable`
+    schema : `str`
+        Name of a schema containing the `electric_vechicles` table/view.
+
+    Returns
+    -------
+    df: `pandas.DataFrame`
+
+        Electric vehicles data.
+
+    """
     datetime_columns = ["delivery_date", "lease_end_date"]
     df = pd.read_sql_table("electric_vehicles", con, schema, index_col="dataid",
                            parse_dates=datetime_columns)
@@ -47,7 +84,23 @@ def read_electric_vehicles_table(con: sqlalchemy.engine.Connectable,
 def read_metadata_table(con: sqlalchemy.engine.Connectable,
                         schema: str,
                         tz: str = "US/Central") -> pd.DataFrame:
-    """Read PostgreSQL metadata table into a pandas DataFrame."""
+    """
+    Read metadata table from a database into a `pandas.DataFrame`.
+
+    Parameters
+    ----------
+    con : `sqlalchemy.engine.Connectable`
+    schema : `str`
+        Name of a schema containing the `metadata` table/view.
+    tz : `str`, default: "US/Central"
+
+    Returns
+    -------
+    df: `pandas.DataFrame`
+
+        Metadata table.
+
+    """
     df = pd.read_sql_table("metadata", con, schema, index_col="dataid")
 
     # Columns with only "yes" and `None` or " " should have type `bool`
@@ -76,6 +129,27 @@ def read_water_ert_query(con: sqlalchemy.engine.Connectable,
                          start_time: Union[pd.Timestamp, str],
                          end_time: Union[pd.Timestamp, str],
                          tz: str = "US/Central")-> pd.DataFrame:
+    """
+    Read water ERT data from a database into a `pandas.DataFrame`.
+
+    Parameters
+    ----------
+    con : `sqlalchemy.engine.Connectable`
+    schema : `str`
+        Name of a schema containing the `water_ert` table/view.
+    dataid : `int`
+        The unique identifier for a particular household.
+    start_time : `Union[pd.Timestamp, str]`
+    end_time : `Union[pd.Timestamp, str]`
+    tz : `str`, default: "US/Central"
+
+    Returns
+    -------
+    df: `pandas.DataFrame`
+
+        Water ERT data for a particular household.
+
+    """
     template = """SELECT readtime, meter_value FROM {schema}.water_ert
                   WHERE dataid={dataid} AND
                     readtime >= '{start_time}' AND
@@ -93,13 +167,34 @@ def read_water_ert_query(con: sqlalchemy.engine.Connectable,
     return df
 
 
-def read_water_ert_capstone_query(con: sqlalchemy.engine.Connectable,
-                                  schema: str,
-                                  dataid: int,
-                                  start_time: Union[pd.Timestamp, str],
-                                  end_time: Union[pd.Timestamp, str],
-                                  tz: str = "US/Central")-> pd.DataFrame:
-    template = """SELECT localminute, consumption FROM {schema}.water_ert_capstone
+def read_water_capstone_query(con: sqlalchemy.engine.Connectable,
+                              schema: str,
+                              dataid: int,
+                              start_time: Union[pd.Timestamp, str],
+                              end_time: Union[pd.Timestamp, str],
+                              tz: str = "US/Central")-> pd.DataFrame:
+    """
+    Read water capstone data from a database into a `pandas.DataFrame`.
+
+    Parameters
+    ----------
+    con : `sqlalchemy.engine.Connectable`
+    schema : `str`
+        Name of a schema containing the `water_capstone` table/view.
+    dataid : `int`
+        The unique identifier for a particular household.
+    start_time : `Union[pd.Timestamp, str]`
+    end_time : `Union[pd.Timestamp, str]`
+    tz : `str`, default: "US/Central"
+
+    Returns
+    -------
+    df: `pandas.DataFrame`
+
+        Water capstone data for a particular household.
+
+    """
+    template = """SELECT localminute, consumption FROM {schema}.water_capstone
                   WHERE dataid={dataid} AND
                     localminute >= '{start_time}' AND
                     localminute < '{end_time}'

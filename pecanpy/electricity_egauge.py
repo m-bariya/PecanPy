@@ -23,22 +23,34 @@ def read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
                                   freq: str = 'T',
                                   tz: str = "US/Central") -> pd.DataFrame:
     """
-    Read electricity egauge data from a database into a `DataFrame`.
+    Read electricity egauge data from a database into a `pandas.DataFrame`.
 
-    Parameters:
-    -----------
-    con: `sqlalchemy.engine.Connectable`
-    schema: `str`
-    dataid: `int`
-    start_time: `Union[pd.Timestamp, str]`
-    end_time: `Union[pd.Timestamp, str]`
-    columns: `Union[List[str], str]`, default: "all"
-    freq: `str`, default: 'T'
-    tz: `str`, default: "US/Central"
+    Parameters
+    ----------
+    con : `sqlalchemy.engine.Connectable`
+    schema : `str`
+        Name of a schema containing the "electricity_egauge_minutes",
+        "electricity_egauge_15min" and "electricity_egauge_hours" tables/views.
+    dataid : `int`
+        The unique identifier for a particular household.
+    start_time : `Union[pd.Timestamp, str]`
+    end_time : `Union[pd.Timestamp, str]`
+    columns : `Union[List[str], str]`, default: "all"
+    freq : `str`, default: 'T'
+        The desired sampling frequency for the returned electricity egauge data.
+        Must be one of 'T' (minutes), "15T" (15-minute), or 'H' (hourly).
+    tz : `str`, default: "US/Central"
 
-    Returns:
-    --------
+    Returns
+    -------
     results_df: `pandas.DataFrame`
+
+        Electricity egauge data for a particular household.
+
+    Raises
+    ------
+    ValueError
+        If `freq` is not one of 'T', "15T", or 'H'.
 
     """
     kwargs = {"con": con, "schema": schema, "dataid": dataid,
@@ -74,13 +86,32 @@ def _read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
                                    columns: Union[List[str], str],
                                    tz: str) -> pd.DataFrame:
     """
-    Read electricity egauge data from a database into a `DataFrame`.
+    Read electricity egauge data from a database into a `pandas.DataFrame`.
 
-    Parameters:
-    -----------
+    Parameters
+    ----------
+    con : `sqlalchemy.engine.Connectable`
+    schema : `str`
+        Name of a schema containing the "electricity_egauge_minutes",
+        "electricity_egauge_15min" and "electricity_egauge_hours" tables/views.
+    table : `str`
+        Table/view containing the electricity egauge data. Must be one of
+         "electricity_egauge_minutes", "electricity_egauge_15min", or
+         "electricity_egauge_hours".
+    local_minute : `str`
+        Name of the datetime column. Varies depending on `table` name.
+    dataid : `int`
+        The unique identifier for a particular household.
+    start_time : `Union[pd.Timestamp, str]`
+    end_time : `Union[pd.Timestamp, str]`
+    columns : `Union[List[str], str]`
+    tz : `str`, default: "US/Central"
 
-    Returns:
-    --------
+    Returns
+    -------
+    results_df: `pandas.DataFrame`
+
+        Electricity egauge data for a particular household.
 
     """
     template = """SELECT {columns} FROM {schema}.{table}
