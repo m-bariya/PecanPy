@@ -15,12 +15,44 @@ import sqlalchemy
 
 def read_survey_2011_all_participants_table(con: sqlalchemy.engine.Connectable,
                                             schema: str) -> pd.DataFrame:
+    """
+    Read 2011 survey data from a database into a `pandas.DataFrame`.
+
+    Parameters
+    ----------
+    con : sqlalchemy.engine.Connectable
+    schema : `str`
+        Name of schema containing the `survey_2011_all_participants` table/view.
+
+    Returns
+    -------
+    df: `pandas.DataFrame`
+
+        2011 survey data for all participants.
+
+    """
     df = pd.read_sql_table("survey_2011_all_participants", con, schema)
     return df
 
 
 def read_survey_2012_all_participants_table(con: sqlalchemy.engine.Connectable,
                                             schema: str) -> pd.DataFrame:
+    """
+    Read 2012 survey data from a database into a `pandas.DataFrame`.
+
+    Parameters
+    ----------
+    con : sqlalchemy.engine.Connectable
+    schema : `str`
+        Name of schema containing the `survey_2012_all_participants` table/view.
+
+    Returns
+    -------
+    df: `pandas.DataFrame`
+
+        2012 survey data for all participants.
+
+    """
     datetime_columns = ["start_time", "date_submitted"]
     df = pd.read_sql_table("survey_2012_all_participants", con, schema,
                            index_col=["response_id"], parse_dates=datetime_columns)
@@ -29,6 +61,22 @@ def read_survey_2012_all_participants_table(con: sqlalchemy.engine.Connectable,
 
 def read_survey_2012_field_descriptions_table(con: sqlalchemy.engine.Connectable,
                                               schema: str) -> pd.DataFrame:
+    """
+    Read 2012 survey field descriptions from a database into a `pandas.DataFrame`.
+
+    Parameters
+    ----------
+    con : sqlalchemy.engine.Connectable
+    schema : `str`
+        Name of schema containing the `survey_2012_field_descriptions` table/view.
+
+    Returns
+    -------
+    df: `pandas.DataFrame`
+
+        2012 survey field descriptions.
+
+    """
     df = pd.read_sql_table("survey_2012_field_descriptions", con, schema,
                            index_col=["column_name"])
     return df
@@ -36,6 +84,22 @@ def read_survey_2012_field_descriptions_table(con: sqlalchemy.engine.Connectable
 
 def read_survey_2013_all_participants_table(con: sqlalchemy.engine.Connectable,
                                             schema: str) -> pd.DataFrame:
+    """
+    Read 2013 survey data from a database into a `pandas.DataFrame`.
+
+    Parameters
+    ----------
+    con : sqlalchemy.engine.Connectable
+    schema : `str`
+        Name of schema containing the `survey_2013_all_participants` table/view.
+
+    Returns
+    -------
+    df: `pandas.DataFrame`
+
+        2013 survey data for all participants.
+
+    """
     df = pd.read_sql_table("survey_2013_all_participants", con, schema)
 
     # these variables are encoded as True/False but could also be 1/0.
@@ -269,6 +333,22 @@ def read_survey_2013_all_participants_table(con: sqlalchemy.engine.Connectable,
 
 def read_survey_2013_field_descriptions_table(con: sqlalchemy.engine.Connectable,
                                               schema: str) -> pd.DataFrame:
+    """
+    Read 2013 survey field descriptions from a database into a `pandas.DataFrame`.
+
+    Parameters
+    ----------
+    con : sqlalchemy.engine.Connectable
+    schema : `str`
+        Name of schema containing the `survey_2013_field_descriptions` table/view.
+
+    Returns
+    -------
+    df: `pandas.DataFrame`
+
+        2013 survey field descriptions.
+
+    """
     df = pd.read_sql_table("survey_2013_field_descriptions", con, schema,
                            index_col=["column_name"])
     return df
@@ -276,6 +356,22 @@ def read_survey_2013_field_descriptions_table(con: sqlalchemy.engine.Connectable
 
 def read_survey_2014_all_participants_table(con: sqlalchemy.engine.Connectable,
                                             schema: str) -> pd.DataFrame:
+    """
+    Read 2014 survey data from a database into a `pandas.DataFrame`.
+
+    Parameters
+    ----------
+    con : sqlalchemy.engine.Connectable
+    schema : `str`
+        Name of schema containing the `survey_2014_all_participants` table/view.
+
+    Returns
+    -------
+    df: `pandas.DataFrame`
+
+        2014 survey data for all participants.
+
+    """
     df = pd.read_sql_table("survey_2014_all_participants", con, schema)
 
     # merge the two foundation columns into single categorical columns
@@ -413,6 +509,22 @@ def read_survey_2014_all_participants_table(con: sqlalchemy.engine.Connectable,
 
 def read_survey_2014_field_descriptions_table(con: sqlalchemy.engine.Connectable,
                                               schema: str) -> pd.DataFrame:
+    """
+    Read 2014 survey field descriptions from a database into a `pandas.DataFrame`.
+
+    Parameters
+    ----------
+    con : sqlalchemy.engine.Connectable
+    schema : `str`
+        Name of schema containing the `survey_2014_field_descriptions` table/view.
+
+    Returns
+    -------
+    df: `pandas.DataFrame`
+
+        2014 survey field descriptions.
+
+    """
     df = pd.read_sql_table("survey_2014_field_descriptions", con, schema,
                            index_col=["column_name"])
     df.drop("id", axis=1, inplace=True)
