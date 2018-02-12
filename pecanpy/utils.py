@@ -8,7 +8,11 @@ import pandas as pd
 import sqlalchemy
 
 
-def create_engine(user_name, password, host, port, db):
+def create_engine(user_name: str,
+                  password: str,
+                  host: str,
+                  port: int,
+                  db: str) -> sqlalchemy.engine.Engine:
     """Create a PostgreSQL engine."""
     url = "postgresql://{}:{}@{}:{}/{}".format(user_name, password, host, port, db)
     engine = sqlalchemy.create_engine(url)
