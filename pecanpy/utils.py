@@ -8,6 +8,57 @@ import pandas as pd
 import sqlalchemy
 
 
+def read_sql_query(con: sqlalchemy.engine.Connectable,
+                         SQLstr = None,
+                         SQLfile = None,
+                         index_col = None,
+                         parse_dates = None) -> pd.DataFrame:
+    """
+    Execute arbitrary SQL Select query against a database, returning results
+    in a pandas DataFrame. No data manipulation or munging is performed. Either
+    SQLstr or SQLfile should be not None. Either way, the first word in the SQL
+    query should be "SELECT".
+
+    Parameters:
+    -----------
+    con = `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.    
+    SQLstr = `str`
+        string holding the select query to execute
+    SQLfile = `str`
+        full path to text file holding the select query to execute
+    index_col = `string or list of strings`, optional
+        see pandas.read_sql_query()
+    parse_dates = `list or dict`, optional
+        see pandas.read_sql_query()
+
+    Returns:
+    --------
+    pandas dataframe holding query results
+    """
+    
+    # input is either through a SQL string or a file with SQL code
+    if (SQLstr is None) and (SQLfile is None):
+      raise TypeError('Please pass either the SQLstr or the SQLfile argument!')
+    elif (SQLstr is not None):
+      SQL = SQLstr
+    elif (SQLfile is not None):
+      with open(SQLfile,'rt') as f:
+      SQL = f.read()
+    else:
+      return None # should never happend
+    
+    # enforce that this must be a select query
+    try:
+      SQL.upper().index('SELECT',0)
+    except ValueError as e:
+      raise ValueError('SQL statement must start with "SELECT"!')
+    
+    return pd.read_sql_query(SQL, con)
+  
+
 def create_engine(user_name: str,
                   password: str,
                   host: str,
