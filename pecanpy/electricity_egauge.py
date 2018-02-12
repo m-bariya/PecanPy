@@ -28,6 +28,9 @@ def read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
     Parameters
     ----------
     con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of a schema containing the "electricity_egauge_minutes",
         "electricity_egauge_15min" and "electricity_egauge_hours" tables/views.
@@ -91,6 +94,9 @@ def _read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
     Parameters
     ----------
     con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of a schema containing the "electricity_egauge_minutes",
         "electricity_egauge_15min" and "electricity_egauge_hours" tables/views.

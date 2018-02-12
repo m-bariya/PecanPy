@@ -20,7 +20,10 @@ def read_survey_2011_all_participants_table(con: sqlalchemy.engine.Connectable,
 
     Parameters
     ----------
-    con : sqlalchemy.engine.Connectable
+    con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of schema containing the `survey_2011_all_participants` table/view.
 
@@ -42,7 +45,10 @@ def read_survey_2012_all_participants_table(con: sqlalchemy.engine.Connectable,
 
     Parameters
     ----------
-    con : sqlalchemy.engine.Connectable
+    con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of schema containing the `survey_2012_all_participants` table/view.
 
@@ -66,7 +72,10 @@ def read_survey_2012_field_descriptions_table(con: sqlalchemy.engine.Connectable
 
     Parameters
     ----------
-    con : sqlalchemy.engine.Connectable
+    con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of schema containing the `survey_2012_field_descriptions` table/view.
 
@@ -89,7 +98,10 @@ def read_survey_2013_all_participants_table(con: sqlalchemy.engine.Connectable,
 
     Parameters
     ----------
-    con : sqlalchemy.engine.Connectable
+    con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of schema containing the `survey_2013_all_participants` table/view.
 
@@ -338,7 +350,10 @@ def read_survey_2013_field_descriptions_table(con: sqlalchemy.engine.Connectable
 
     Parameters
     ----------
-    con : sqlalchemy.engine.Connectable
+    con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of schema containing the `survey_2013_field_descriptions` table/view.
 
@@ -361,7 +376,10 @@ def read_survey_2014_all_participants_table(con: sqlalchemy.engine.Connectable,
 
     Parameters
     ----------
-    con : sqlalchemy.engine.Connectable
+    con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of schema containing the `survey_2014_all_participants` table/view.
 
@@ -514,7 +532,10 @@ def read_survey_2014_field_descriptions_table(con: sqlalchemy.engine.Connectable
 
     Parameters
     ----------
-    con : sqlalchemy.engine.Connectable
+    con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of schema containing the `survey_2014_field_descriptions` table/view.
 

@@ -25,6 +25,9 @@ def read_gas_ert_query(con: sqlalchemy.engine.Connectable,
     Parameters
     ----------
     con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of a schema containing the `gas_ert` table/view.
     dataid : `int`
@@ -65,6 +68,9 @@ def read_electric_vehicles_table(con: sqlalchemy.engine.Connectable,
     Parameters
     ----------
     con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of a schema containing the `electric_vechicles` table/view.
 
@@ -90,6 +96,9 @@ def read_metadata_table(con: sqlalchemy.engine.Connectable,
     Parameters
     ----------
     con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of a schema containing the `metadata` table/view.
     tz : `str`, default: "US/Central"
@@ -135,6 +144,9 @@ def read_water_ert_query(con: sqlalchemy.engine.Connectable,
     Parameters
     ----------
     con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of a schema containing the `water_ert` table/view.
     dataid : `int`
@@ -179,6 +191,9 @@ def read_water_capstone_query(con: sqlalchemy.engine.Connectable,
     Parameters
     ----------
     con : `sqlalchemy.engine.Connectable`
+        An object which supports execution of SQL constructs. Currently there
+        are two implementations: `sqlalchemy.engine.Connection` and
+        `sqlalchemy.engine.Engine`.
     schema : `str`
         Name of a schema containing the `water_capstone` table/view.
     dataid : `int`
