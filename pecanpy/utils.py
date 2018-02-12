@@ -56,7 +56,7 @@ def read_sql_query(con: sqlalchemy.engine.Connectable,
     except ValueError as e:
       raise ValueError('SQL statement must start with "SELECT"!')
     
-    return pd.read_sql_query(SQL, con)
+    return pd.read_sql_query(SQL, con, index_col = index_col, parse_dates = parse_dates)
   
 
 def create_engine(user_name: str,
