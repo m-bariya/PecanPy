@@ -4,6 +4,7 @@ Module contining utility functions.
 @author davidrpugh
 
 """
+import pandas as pd
 import sqlalchemy
 
 
