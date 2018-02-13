@@ -21,7 +21,8 @@ def read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
                                   end_time: Union[pd.Timestamp, str],
                                   columns: Union[List[str], str] = "all",
                                   freq: str = 'T',
-                                  tz: str = "US/Central") -> pd.DataFrame:
+                                  tz: str = "US/Central",
+                                  chunksize: Union[int, NoneType] = None) -> pd.DataFrame:
     """
     Read electricity egauge data from a database into a `pandas.DataFrame`.
 
@@ -43,6 +44,9 @@ def read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
         The desired sampling frequency for the returned electricity egauge data.
         Must be one of 'T' (minutes), "15T" (15-minute), or 'H' (hourly).
     tz : `str`, default: "US/Central"
+    chunksize : `Union[int, NoneType]`, default: `None`.
+        If specified, return an iterator where chunksize is the number of rows
+        to include in each chunk.
 
     Returns
     -------
@@ -58,7 +62,7 @@ def read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
     """
     kwargs = {"con": con, "schema": schema, "dataid": dataid,
               "start_time": start_time, "end_time": end_time,
-              "columns": columns, "tz": tz}
+              "columns": columns, "tz": tz, "chunksize": chunksize}
     if freq == 'T':
         minutes_kwargs = {"table": "electricity_egauge_minutes",
                           "local_minute": "localminute"}
@@ -87,7 +91,8 @@ def _read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
                                    start_time: Union[pd.Timestamp, str],
                                    end_time: Union[pd.Timestamp, str],
                                    columns: Union[List[str], str],
-                                   tz: str) -> pd.DataFrame:
+                                   tz: str,
+                                   chunksize: Union[int, NoneType]) -> pd.DataFrame:
     """
     Read electricity egauge data from a database into a `pandas.DataFrame`.
 
@@ -112,6 +117,9 @@ def _read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
     end_time : `Union[pd.Timestamp, str]`
     columns : `Union[List[str], str]`
     tz : `str`, default: "US/Central"
+    chunksize : `Union[int, NoneType]`, default: `None`.
+        If specified, return an iterator where chunksize is the number of rows
+        to include in each chunk.
 
     Returns
     -------
@@ -134,7 +142,8 @@ def _read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
               "end_time": end_time}
     query = template.format(**kwargs)
     parse_dates= {local_minute: {"utc": True}}
-    df = pd.read_sql_query(query, con=con, parse_dates=parse_dates)
+    df = pd.read_sql_query(query, con=con, parse_dates=parse_dates,
+                           chunksize=chunksize)
     df[local_minute] = df[local_minute].dt.tz_convert(tz)
     df.set_index(local_minute, inplace=True)
     return df
