@@ -12,7 +12,9 @@ def read_sql_query(con: sqlalchemy.engine.Connectable,
                          SQLstr = None,
                          SQLfile = None,
                          index_col = None,
-                         parse_dates = None) -> pd.DataFrame:
+                         parse_dates = None,
+                         params = None,
+                         chunksize = None) -> pd.DataFrame:
     """
     Execute arbitrary SQL Select query against a database, returning results
     in a pandas DataFrame. No data manipulation or munging is performed. Either
@@ -33,6 +35,10 @@ def read_sql_query(con: sqlalchemy.engine.Connectable,
         see pandas.read_sql_query()
     parse_dates = `list or dict`, optional
         see pandas.read_sql_query()
+    params = `list, tuple or dict`, optional
+        see pandas.read_sql_query()
+    chunksize: `int`, optional
+        see pandas.read_sql_query()
 
     Returns:
     --------
@@ -46,9 +52,9 @@ def read_sql_query(con: sqlalchemy.engine.Connectable,
       SQL = SQLstr
     elif (SQLfile is not None):
       with open(SQLfile,'rt') as f:
-      SQL = f.read()
+        SQL = f.read()
     else:
-      return None # should never happend
+      return None # should never happen
     
     # enforce that this must be a select query
     try:
@@ -56,7 +62,8 @@ def read_sql_query(con: sqlalchemy.engine.Connectable,
     except ValueError as e:
       raise ValueError('SQL statement must start with "SELECT"!')
     
-    return pd.read_sql_query(SQL, con, index_col = index_col, parse_dates = parse_dates)
+    return pd.read_sql_query(SQL, con, index_col = index_col, parse_dates = parse_dates,
+                             params = params, chunksize = chunksize)
   
 
 def create_engine(user_name: str,
