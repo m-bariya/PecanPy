@@ -4,17 +4,19 @@ Module contining utility functions.
 @author davidrpugh
 
 """
+from typing import Generator, List, Union
+
 import pandas as pd
 import sqlalchemy
 
 
 def read_sql_query(con: sqlalchemy.engine.Connectable,
-                         SQLstr = None,
-                         SQLfile = None,
-                         index_col = None,
-                         parse_dates = None,
-                         params = None,
-                         chunksize = None) -> pd.DataFrame:
+                   sql_str: Union[str, None] = None,
+                   sql_file: Union[str, None] = None,
+                   index_col = None,
+                   parse_dates = None,
+                   params = None,
+                   chunksize: Union[int, None] = None) -> Union[pd.DataFrame, Generator]:
     """
     Execute arbitrary SQL Select query against a database, returning results
     in a pandas DataFrame. No data manipulation or munging is performed. Either
@@ -27,7 +29,7 @@ def read_sql_query(con: sqlalchemy.engine.Connectable,
     con = `sqlalchemy.engine.Connectable`
         An object which supports execution of SQL constructs. Currently there
         are two implementations: `sqlalchemy.engine.Connection` and
-        `sqlalchemy.engine.Engine`.    
+        `sqlalchemy.engine.Engine`.
     SQLstr = `str`
         string holding the select query to execute
     SQLfile = `str`
@@ -45,7 +47,7 @@ def read_sql_query(con: sqlalchemy.engine.Connectable,
     --------
     pandas dataframe holding query results, or a generator if chunksize is used
     """
-    
+
     # input is either through a SQL string or a file with SQL code
     if (SQLstr is None) and (SQLfile is None):
       raise TypeError('Please pass either the SQLstr or the SQLfile argument!')
@@ -56,16 +58,16 @@ def read_sql_query(con: sqlalchemy.engine.Connectable,
         SQL = f.read()
     else:
       return None # should never happen
-    
+
     # enforce that this must be a select query
     try:
       SQL.upper().index('SELECT',0)
     except ValueError as e:
       raise ValueError('SQL statement must start with "SELECT"!')
-    
+
     return pd.read_sql_query(SQL, con, index_col = index_col, parse_dates = parse_dates,
                              params = params, chunksize = chunksize)
-  
+
 
 def create_engine(user_name: str,
                   password: str,
