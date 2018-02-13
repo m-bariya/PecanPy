@@ -19,7 +19,8 @@ def read_sql_query(con: sqlalchemy.engine.Connectable,
     Execute arbitrary SQL Select query against a database, returning results
     in a pandas DataFrame. No data manipulation or munging is performed. Either
     SQLstr or SQLfile should be not None. Either way, the first word in the SQL
-    query should be "SELECT".
+    query should be "SELECT". If chunksize is used, this function returns a
+    generator.
 
     Parameters:
     -----------
