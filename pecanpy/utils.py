@@ -42,7 +42,7 @@ def read_sql_query(con: sqlalchemy.engine.Connectable,
 
     Returns:
     --------
-    pandas dataframe holding query results
+    pandas dataframe holding query results, or a generator if chunksize is used
     """
     
     # input is either through a SQL string or a file with SQL code
