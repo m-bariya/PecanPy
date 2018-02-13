@@ -6,7 +6,7 @@ DataFrame instances.
 @author : davidrpugh
 
 """
-from typing import List, Union
+from typing import Generator, List, Union
 
 import numpy as np
 import pandas as pd
@@ -22,7 +22,7 @@ def read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
                                   columns: Union[List[str], str] = "all",
                                   freq: str = 'T',
                                   tz: str = "US/Central",
-                                  chunksize: Union[int, NoneType] = None) -> pd.DataFrame:
+                                  chunksize: Union[int, None] = None) -> Union[pd.DataFrame, Generator]:
     """
     Read electricity egauge data from a database into a `pandas.DataFrame`.
 
@@ -44,7 +44,7 @@ def read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
         The desired sampling frequency for the returned electricity egauge data.
         Must be one of 'T' (minutes), "15T" (15-minute), or 'H' (hourly).
     tz : `str`, default: "US/Central"
-    chunksize : `Union[int, NoneType]`, default: `None`.
+    chunksize : `Union[int, None]`, default: `None`.
         If specified, return an iterator where chunksize is the number of rows
         to include in each chunk.
 
@@ -92,7 +92,7 @@ def _read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
                                    end_time: Union[pd.Timestamp, str],
                                    columns: Union[List[str], str],
                                    tz: str,
-                                   chunksize: Union[int, NoneType]) -> pd.DataFrame:
+                                   chunksize: Union[int, None]) -> Union[pd.DataFrame, Generator]:
     """
     Read electricity egauge data from a database into a `pandas.DataFrame`.
 
@@ -117,7 +117,7 @@ def _read_electricity_egauge_query(con: sqlalchemy.engine.Connectable,
     end_time : `Union[pd.Timestamp, str]`
     columns : `Union[List[str], str]`
     tz : `str`, default: "US/Central"
-    chunksize : `Union[int, NoneType]`, default: `None`.
+    chunksize : `Union[int, None]`, default: `None`.
         If specified, return an iterator where chunksize is the number of rows
         to include in each chunk.
 
