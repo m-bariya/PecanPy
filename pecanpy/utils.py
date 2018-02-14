@@ -20,7 +20,7 @@ def read_sql_query(con: sqlalchemy.engine.Connectable,
     """
     Execute arbitrary SQL Select query against a database, returning results
     in a pandas DataFrame. No data manipulation or munging is performed. Either
-    SQLstr or SQLfile should be not None. Either way, the first word in the SQL
+    sql_str or sql_file should be not None. Either way, the first word in the SQL
     query should be "SELECT". If chunksize is used, this function returns a
     generator.
 
@@ -30,9 +30,9 @@ def read_sql_query(con: sqlalchemy.engine.Connectable,
         An object which supports execution of SQL constructs. Currently there
         are two implementations: `sqlalchemy.engine.Connection` and
         `sqlalchemy.engine.Engine`.
-    SQLstr = `str`
+    sql_str = `str`
         string holding the select query to execute
-    SQLfile = `str`
+    sql_file = `str`
         full path to text file holding the select query to execute
     index_col = `string or list of strings`, optional
         see pandas.read_sql_query()
@@ -49,12 +49,12 @@ def read_sql_query(con: sqlalchemy.engine.Connectable,
     """
 
     # input is either through a SQL string or a file with SQL code
-    if (SQLstr is None) and (SQLfile is None):
-      raise TypeError('Please pass either the SQLstr or the SQLfile argument!')
-    elif (SQLstr is not None):
-      SQL = SQLstr
-    elif (SQLfile is not None):
-      with open(SQLfile,'rt') as f:
+    if (sql_str is None) and (sql_file is None):
+      raise TypeError('Please pass either the sql_str or the sql_file argument!')
+    elif (sql_str is not None):
+      SQL = sql_str
+    elif (sql_file is not None):
+      with open(sql_file,'rt') as f:
         SQL = f.read()
     else:
       return None # should never happen
