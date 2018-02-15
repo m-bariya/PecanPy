@@ -414,11 +414,7 @@ def read_survey_2014_all_participants_table(con: sqlalchemy.engine.Connectable,
             df[column] = (df[column].replace({'': None})
                                     .notnull())
         elif column.startswith("residents_"):
-            dtype = types.CategoricalDtype(categories=[0, 1, 2, 3, 4, 5],
-                                           ordered=True)
-            strs_with_ints = {'': 0, '1': 1, '2': 2, '3': 3, '4': 4, "5 or more": 5}
-            df[column] = (df[column].replace(strs_with_ints)
-                                    .astype(dtype))
+            df[column] = (df[column].replace({'None':0,'':0,'5 or more':5}).astype('int64'))
         elif column == "education_level":
             categories = ["High School graduate",
                           "Some college/trade/vocational school",
@@ -514,11 +510,7 @@ def read_survey_2014_all_participants_table(con: sqlalchemy.engine.Connectable,
         elif column == "electronic_devices_on_other":
             df.drop(column, axis=1, inplace=True)  # significant cleaning required!
         elif column.startswith("electronic_devices_"):
-            dtype = types.CategoricalDtype(categories=[0, 1, 2, 3, 4, 5],
-                                           ordered=True)
-            strs_with_ints = {'': 0, '1': 1, '2': 2, '3': 3, '4': 4, "5 or more": 5}
-            df[column] = (df[column].replace(strs_with_ints)
-                                    .astype(dtype))
+            df[column] = (df[column].replace({'None':0,'':0,'5 or more':5}).astype('int64'))
         else:
             pass
 
