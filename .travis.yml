@@ -22,4 +22,4 @@ install:
 
 script:
   - source activate pecanpy-dev
-  - python setup.py install
+  - python setup.py build
