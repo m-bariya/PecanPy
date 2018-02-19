@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/KAPSARC/PecanPy.svg?branch=master)](https://travis-ci.org/KAPSARC/PecanPy)
+
 # PecanPy
 
 Python API for the Pecan Street [Dataport](https://dataport.cloud/).
