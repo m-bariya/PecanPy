@@ -19,5 +19,7 @@ before_install:
 
 install:
   - conda env create -f environment.yml
+
+script:
   - source activate pecanpy-dev
   - python setup.py install
