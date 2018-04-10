@@ -1,6 +1,7 @@
 name: pecanpy-dev
 
 dependencies:
+  - pip
   - python >= 3.6
   - jupyter
   - matplotlib
@@ -8,3 +9,6 @@ dependencies:
   - psycopg2
   - sqlalchemy
   - scikit-learn
+  - pip:
+    - tensorflow
+  
